@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 
 from keras.models import Sequential
-from keras.layers import Flatten, Dense
+from keras.layers import Flatten, Dense, Lambda
 
 # read the csv file and store the data
 lines = []
@@ -41,15 +41,18 @@ y_train = np.array(measurements)
 # create a model
 model = Sequential()
 
-# add flatten imput layer
-model.add(Flatten(input_shape=(160, 320, 3)))
+# preprocess image befor processing in the network
+model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160, 320, 3)))
+
+# add flatten layer
+model.add(Flatten())
 
 # add dense output layer
 model.add(Dense(1))
 
 # compile model, use mean square error loss function as it's a continuous output with regression
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=7)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=4)
 
 # save the model for usage
 model.save('model.h5')

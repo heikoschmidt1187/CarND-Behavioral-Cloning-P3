@@ -1,0 +1,7 @@
+1 - general processing like in the videos
+  - first training data with one round
+  - car drives in right circles
+
+2 - added pixel normalization Lambda
+  - decreased epochs to 5 for a better loss
+  - loss: 0.4239
