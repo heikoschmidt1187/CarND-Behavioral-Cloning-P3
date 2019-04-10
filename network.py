@@ -21,17 +21,26 @@ images = []
 measurements = []
 
 for line in lines:
-    # get the filename of the center image and append to the current image path
-    source_path = line[0]
-    filename = source_path.split('/')[-1]
-    current_path = './training_data/IMG/' + filename
 
-    # use OpenCV to read the image
-    image = cv2.imread(current_path)
-    images.append(image)
+    # get left and right images as well as centered
+    for i in range(3):
+        # get the filename of the center image and append to the current image path
+        source_path = line[i]
+        filename = source_path.split('/')[-1]
+        current_path = './training_data/IMG/' + filename
 
-    # extract steering measurements
-    measurements.append(float(line[3]))
+        # use OpenCV to read the image
+        image = cv2.imread(current_path)
+        images.append(image)
+
+        # extract steering measurements
+        # TODO: more elegant implementation
+        if i == 0:
+            measurements.append(float(line[3]))
+        elif i == 1:
+            measurements.append(float(line[3]) + 0.2)
+        else:
+            measurements.append(float(line[3]) - 0.2)
 
 ### image augmentation to make a greater and homogeneous training set
 augmented_images = []

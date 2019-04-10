@@ -10,3 +10,10 @@
     the use as a learning network for automomous driving
   - increased epochs to 10, it's too much but validation loss is at 0.0033
   --> changed back to 4 --> val_loss 0.0011
+
+4 - Augmentation of data by flipping, still bad on driving despite good loss ???
+
+5 - Implemented usage of left and right image + steering measurment correction
+    factor of 0.2
+  - val_loss = 0.003
+  - better, not one full round, but first turns are taken slooowly but right :-D
