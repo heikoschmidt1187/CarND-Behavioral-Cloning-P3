@@ -5,3 +5,8 @@
 2 - added pixel normalization Lambda
   - decreased epochs to 5 for a better loss
   - loss: 0.4239
+
+3 - implemented LeNet from traffic sign classifier project in Keras and adapted to
+    the use as a learning network for automomous driving
+  - increased epochs to 10, it's too much but validation loss is at 0.0033
+  --> changed back to 4 --> val_loss 0.0011
