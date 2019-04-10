@@ -17,3 +17,6 @@
     factor of 0.2
   - val_loss = 0.003
   - better, not one full round, but first turns are taken slooowly but right :-D
+
+6 - cropping not important parts from the image to eliminate sky, trees, mountains, car hood
+  - val_loss 0.0229....what!?

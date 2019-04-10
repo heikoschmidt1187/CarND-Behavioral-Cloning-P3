@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda, Convolution2D, MaxPooling2D
+from keras.layers import Flatten, Dense, Lambda, Convolution2D, MaxPooling2D, Cropping2D
 
 # read the csv file and store the data
 lines = []
@@ -66,6 +66,9 @@ model = Sequential()
 
 # preprocess image befor processing in the network
 model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160, 320, 3)))
+
+# crop the top 70px and the bottom 25px to eliminate useless image information (trees, mountains, sky, hood)
+model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 
 # First convolutional layer
 model.add(Convolution2D(6, 5, 5, activation='relu'))
