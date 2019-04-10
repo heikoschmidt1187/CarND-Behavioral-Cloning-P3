@@ -33,10 +33,22 @@ for line in lines:
     # extract steering measurements
     measurements.append(float(line[3]))
 
+### image augmentation to make a greater and homogeneous training set
+augmented_images = []
+augmented_measurements = []
+
+# loop through all images + measurements to augment the data
+for image, measurement in zip(images, measurements):
+    # append original data
+    augmented_images.append(image)
+    augmented_measurements.append(measurement)
+    augmented_images.append(cv2.flip(image, 1))
+    augmented_measurements.append(measurement * -1.0)
+
 ### neural network and training ###
 # convert to numpy arrays as this format is needed by Keras
-X_train = np.array(images)
-y_train = np.array(measurements)
+X_train = np.array(augmented_images)
+y_train = np.array(augmented_measurements)
 
 # Own LeNet for test
 
