@@ -1,9 +1,10 @@
 import csv
 import cv2
 import numpy as np
+import tensorflow as tf
 
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda, Convolution2D, MaxPooling2D, Cropping2D
+from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D, Input, GlobalAveragePooling2D
 
 # read the csv file and store the data
 lines = []
@@ -59,40 +60,50 @@ for image, measurement in zip(images, measurements):
 X_train = np.array(augmented_images)
 y_train = np.array(augmented_measurements)
 
-# Own LeNet for test
-
-# create a model
+# use NVIDIA proved CNN --> https://devblogs.nvidia.com/deep-learning-self-driving-cars/
 model = Sequential()
 
-# preprocess image befor processing in the network
+# input and normalization layer 3@320x160
 model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160, 320, 3)))
 
 # crop the top 70px and the bottom 25px to eliminate useless image information (trees, mountains, sky, hood)
+# Output 3@320x65
 model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 
-# First convolutional layer
-model.add(Convolution2D(6, 5, 5, activation='relu'))
+# First convolutional layer, 2x2 stride, 5x5 kernel
+model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='relu'))
 
-# First Max Pooling Layer
-model.add(MaxPooling2D())
+# Second convolutional layer, 2x2 stride, 5x5 kernel
+model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), activation='relu'))
 
-# Second convolutional layer
-model.add(Convolution2D(6, 5, 5, activation='relu'))
+# Third convolutional layer, 2x2 stride, 5x5 kernel
+model.add(Conv2D(48, kernel_size=(5, 5), strides=(2, 2), activation='relu'))
 
-# Second Max Pooling Layer
-model.add(MaxPooling2D())
+# Fourth convolutional layer, no stride, 3x3 kernel
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
 
-# Flatten layer
+# Fifth convolutional layer, no stride, 3x3 kernel
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+
+# Flatten Layer
 model.add(Flatten())
 
-# fully connected layers
-model.add(Dense(120))
-model.add(Dense(84))
+# Fully connected layers
+model.add(Dense(100))
+model.add(Dense(50))
+model.add(Dense(10))
+
+# Output layer
 model.add(Dense(1))
+
+# print model to see layers
+for layer in model.layers:
+    print(layer.output_shape)
+
 
 # compile model, use mean square error loss function as it's a continuous output with regression
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=4)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=10)
 
 # save the model for usage
 model.save('model.h5')

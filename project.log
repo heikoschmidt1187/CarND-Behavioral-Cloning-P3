@@ -20,3 +20,8 @@
 
 6 - cropping not important parts from the image to eliminate sky, trees, mountains, car hood
   - val_loss 0.0229....what!?
+
+7 - implemented NVIDIA CNN for automomous driving
+  - 10 epochs
+  - val_loss 0.0075, loss decreasing, val loss stagnation --> overfitting
+  - first full round!!!! :-D
