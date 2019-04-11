@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D, Input, GlobalAveragePooling2D
+from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D, Input, GlobalAveragePooling2D, Dropout
 
 # read the csv file and store the data
 lines = []
@@ -90,8 +90,13 @@ model.add(Flatten())
 
 # Fully connected layers
 model.add(Dense(100))
+model.add(Dropout(0.5))
+
 model.add(Dense(50))
+model.add(Dropout(0.5))
+
 model.add(Dense(10))
+model.add(Dropout(0.5))
 
 # Output layer
 model.add(Dense(1))

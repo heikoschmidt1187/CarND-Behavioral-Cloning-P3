@@ -29,3 +29,6 @@
 8 - two more rounds left, two round right, some revover training data left
   - val_loss 0.0419, loss 0.0037 -- massively overfitting
   - baaad driving
+
+9 - added dropout layers with 0.5 after each FC layers
+  - val_loss 0.03x --> loss 0.01...no good driving
