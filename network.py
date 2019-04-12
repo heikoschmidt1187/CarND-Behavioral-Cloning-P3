@@ -5,6 +5,7 @@ import tensorflow as tf
 
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D, Input, GlobalAveragePooling2D, Dropout
+from keras import optimizers
 
 # read the csv file and store the data
 lines = []
@@ -71,32 +72,31 @@ model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160, 320, 3)))
 model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 
 # First convolutional layer, 2x2 stride, 5x5 kernel
-model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='relu'))
+model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
 
 # Second convolutional layer, 2x2 stride, 5x5 kernel
-model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), activation='relu'))
+model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
 
 # Third convolutional layer, 2x2 stride, 5x5 kernel
-model.add(Conv2D(48, kernel_size=(5, 5), strides=(2, 2), activation='relu'))
+model.add(Conv2D(48, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
 
 # Fourth convolutional layer, no stride, 3x3 kernel
-model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+model.add(Conv2D(64, kernel_size=(3, 3), activation='elu'))
 
 # Fifth convolutional layer, no stride, 3x3 kernel
-model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+model.add(Conv2D(64, kernel_size=(3, 3), activation='elu'))
 
 # Flatten Layer
 model.add(Flatten())
 
 # Fully connected layers
 model.add(Dense(100))
-model.add(Dropout(0.5))
+#model.add(Dropout(0.2))
 
 model.add(Dense(50))
-model.add(Dropout(0.5))
+#model.add(Dropout(0.5))
 
 model.add(Dense(10))
-model.add(Dropout(0.5))
 
 # Output layer
 model.add(Dense(1))
@@ -108,7 +108,7 @@ for layer in model.layers:
 
 # compile model, use mean square error loss function as it's a continuous output with regression
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=10)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=4)
 
 # save the model for usage
 model.save('model.h5')
