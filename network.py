@@ -2,13 +2,18 @@ import csv
 import cv2
 import numpy as np
 import tensorflow as tf
+import random
+import math
 
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D, Input, GlobalAveragePooling2D, Dropout
 from keras import optimizers
 
-# read the csv file and store the data
-lines = []
+import sklearn
+from sklearn.model_selection import train_test_split
+
+# create samples to hold the paths
+samples = []
 
 # open the csv file
 with open('./training_data/driving_log.csv') as csvfile:
@@ -16,50 +21,74 @@ with open('./training_data/driving_log.csv') as csvfile:
 
     # read lines and add to list
     for line in reader:
-        lines.append(line)
+        samples.append(line)
 
-# extract center image and steering angle measurement
-images = []
-measurements = []
+# split samples into training and validation data
+train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
-for line in lines:
+# generator to handle batches
+def generator(samples, batch_size=32):
+    num_samples = len(samples)
 
-    # get left and right images as well as centered
-    for i in range(3):
-        # get the filename of the center image and append to the current image path
-        source_path = line[i]
-        filename = source_path.split('/')[-1]
-        current_path = './training_data/IMG/' + filename
+    # generators run forever
+    while True:
+        random.shuffle(samples)
 
-        # use OpenCV to read the image
-        image = cv2.imread(current_path)
-        images.append(image)
+        for offset in range(0, num_samples, batch_size):
+            batch_samples = samples[offset:offset + batch_size]
 
-        # extract steering measurements
-        # TODO: more elegant implementation
-        if i == 0:
-            measurements.append(float(line[3]))
-        elif i == 1:
-            measurements.append(float(line[3]) + 0.2)
-        else:
-            measurements.append(float(line[3]) - 0.2)
+            # extract center image and steering angle measurement
+            images = []
+            measurements = []
 
-### image augmentation to make a greater and homogeneous training set
-augmented_images = []
-augmented_measurements = []
+            for batch_sample in batch_samples:
 
-# loop through all images + measurements to augment the data
-for image, measurement in zip(images, measurements):
-    # append original data
-    augmented_images.append(image)
-    augmented_measurements.append(measurement)
-    augmented_images.append(cv2.flip(image, 1))
-    augmented_measurements.append(measurement * -1.0)
+                # get left and right images as well as centered
+                for i in range(3):
+                    # get the filename of the center image and append to the current image path
+                    source_path = line[i]
+                    filename = source_path.split('/')[-1]
+                    current_path = './training_data/IMG/' + filename
+
+                    # use OpenCV to read the image
+                    image = cv2.imread(current_path)
+                    image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
+                    #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                    images.append(image)
+
+                    # extract steering measurements
+                    # augmentation
+                    # TODO: more elegant implementation
+                    if i == 0:
+                        measurements.append(float(line[3]))
+                    elif i == 1:
+                        measurements.append(float(line[3]) + 0.2)
+                    else:
+                        measurements.append(float(line[3]) - 0.2)
+
+                    images.append(cv2.flip(image, 1))
+
+                    if i == 0:
+                        measurements.append(float(line[3]) * -1.0)
+                    elif i == 1:
+                        measurements.append((float(line[3]) + 0.2) * -1.0)
+                    else:
+                        measurements.append((float(line[3]) - 0.2) * -1.0)
+
+
+            # convert to numpy arrays as this format is needed by Keras
+            X_train = np.array(images)
+            y_train = np.array(measurements)
+
+            yield sklearn.utils.shuffle(X_train, y_train)
 
 ### neural network and training ###
-# convert to numpy arrays as this format is needed by Keras
-X_train = np.array(augmented_images)
-y_train = np.array(augmented_measurements)
+# size for batch processing
+batch_size = 32
+
+# generators for training and validation
+train_generator = generator(train_samples, batch_size=batch_size)
+validation_generator = generator(validation_samples, batch_size=batch_size)
 
 # use NVIDIA proved CNN --> https://devblogs.nvidia.com/deep-learning-self-driving-cars/
 model = Sequential()
@@ -90,16 +119,16 @@ model.add(Conv2D(64, kernel_size=(3, 3), activation='elu'))
 model.add(Flatten())
 
 # Fully connected layers
-model.add(Dense(100))
+model.add(Dense(100, activation='elu'))
 #model.add(Dropout(0.2))
 
-model.add(Dense(50))
+model.add(Dense(50, activation='elu'))
 #model.add(Dropout(0.5))
 
-model.add(Dense(10))
+model.add(Dense(10, activation='elu'))
 
 # Output layer
-model.add(Dense(1))
+model.add(Dense(1, activation='elu'))
 
 # print model to see layers
 for layer in model.layers:
@@ -107,8 +136,11 @@ for layer in model.layers:
 
 
 # compile model, use mean square error loss function as it's a continuous output with regression
-model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=4)
+model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+#model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=4)
+model.fit_generator(train_generator, steps_per_epoch=math.ceil(len(train_samples) / batch_size), \
+    validation_data=validation_generator, validation_steps=math.ceil(len(validation_samples) / batch_size),
+    epochs=5, verbose=1)
 
 # save the model for usage
 model.save('model.h5')
