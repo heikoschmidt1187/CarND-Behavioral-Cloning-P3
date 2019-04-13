@@ -103,7 +103,7 @@ def generator(samples, batch_size=32):
                         measurements.append(float(batch_sample[3]) - 0.2)
 
                     # shift images for lane switches
-                    x_translation = 80 * np.random.uniform() - 80/2
+                    x_translation = 40 * np.random.uniform() - 40/2
 
                     if i == 0:
                         steering = float(batch_sample[3])
@@ -173,9 +173,8 @@ model.add(Dense(10, activation='elu'))
 # Output layer
 model.add(Dense(1, activation='elu'))
 
-# print model to see layers
-for layer in model.layers:
-    print(layer.output_shape)
+# print model summary
+model.summary()
 
 
 # compile model, use mean square error loss function as it's a continuous output with regression
@@ -184,7 +183,7 @@ model.compile(loss='mse', optimizer=adam, metrics=['accuracy'])
 #model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=4)
 model.fit_generator(train_generator, steps_per_epoch=math.ceil(len(train_samples) / batch_size), \
     validation_data=validation_generator, validation_steps=math.ceil(len(validation_samples) / batch_size),
-    epochs=200, verbose=1, callbacks=get_callbacks())
+    epochs=10, verbose=1, callbacks=get_callbacks())
 
 # save the model for usage
 model.save('model.h5')
