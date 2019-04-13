@@ -6,7 +6,7 @@ import random
 import math
 
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D, Input, GlobalAveragePooling2D, Dropout
+from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D, Input, GlobalAveragePooling2D, Dropout, BatchNormalization
 from keras import optimizers
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
 
@@ -121,6 +121,39 @@ def generator(samples, batch_size=32):
                     images.append(trans_img)
                     measurements.append(steering_ang)
 
+                    # simulate shadows as they seem to make problems currently
+                    top_y = 320*np.random.uniform()
+                    top_x = 0
+                    bot_x = 160
+                    bot_y = 320*np.random.uniform()
+                    image_rgb = cv2.cvtColor(image,cv2.COLOR_YUV2RGB)
+                    image_hls = cv2.cvtColor(image,cv2.COLOR_RGB2HLS)
+                    shadow_mask = 0*image_hls[:,:,1]
+                    X_m = np.mgrid[0:image.shape[0],0:image.shape[1]][0]
+                    Y_m = np.mgrid[0:image.shape[0],0:image.shape[1]][1]
+                    shadow_mask[((X_m-top_x)*(bot_y-top_y) -(bot_x - top_x)*(Y_m-top_y) >=0)]=1
+                    #random_bright = .25+.7*np.random.uniform()
+                    if np.random.randint(2)==1:
+                        random_bright = .5
+                        cond1 = shadow_mask==1
+                        cond0 = shadow_mask==0
+                        if np.random.randint(2)==1:
+                            image_hls[:,:,1][cond1] = image_hls[:,:,1][cond1]*random_bright
+                        else:
+                            image_hls[:,:,1][cond0] = image_hls[:,:,1][cond0]*random_bright
+                    image_hls = cv2.cvtColor(image_hls,cv2.COLOR_HLS2RGB)
+                    image = cv2.cvtColor(image_hls,cv2.COLOR_RGB2YUV)
+
+                    images.append(image)
+
+                    if i == 0:
+                        measurements.append(float(batch_sample[3]))
+                    elif i == 1:
+                        measurements.append(float(batch_sample[3]) + 0.2)
+                    else:
+                        measurements.append(float(batch_sample[3]) - 0.2)
+
+
             # convert to numpy arrays as this format is needed by Keras
             X_train = np.array(images)
             y_train = np.array(measurements)
@@ -129,7 +162,7 @@ def generator(samples, batch_size=32):
 
 ### neural network and training ###
 # size for batch processing
-batch_size = 25
+batch_size = 16
 
 # generators for training and validation
 train_generator = generator(train_samples, batch_size=batch_size)
@@ -147,18 +180,23 @@ model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 
 # First convolutional layer, 2x2 stride, 5x5 kernel
 model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
+model.add(BatchNormalization());
 
 # Second convolutional layer, 2x2 stride, 5x5 kernel
 model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
+model.add(BatchNormalization());
 
 # Third convolutional layer, 2x2 stride, 5x5 kernel
 model.add(Conv2D(48, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
+model.add(BatchNormalization());
 
 # Fourth convolutional layer, no stride, 3x3 kernel
 model.add(Conv2D(64, kernel_size=(3, 3), activation='elu'))
+model.add(BatchNormalization());
 
 # Fifth convolutional layer, no stride, 3x3 kernel
 model.add(Conv2D(64, kernel_size=(3, 3), activation='elu'))
+model.add(BatchNormalization());
 
 # Flatten Layer
 model.add(Flatten())
