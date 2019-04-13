@@ -46,7 +46,7 @@ def generator(samples, batch_size=32):
                 # get left and right images as well as centered
                 for i in range(3):
                     # get the filename of the center image and append to the current image path
-                    source_path = line[i]
+                    source_path = batch_sample[i]
                     filename = source_path.split('/')[-1]
                     current_path = './training_data/IMG/' + filename
 
@@ -60,21 +60,60 @@ def generator(samples, batch_size=32):
                     # augmentation
                     # TODO: more elegant implementation
                     if i == 0:
-                        measurements.append(float(line[3]))
+                        measurements.append(float(batch_sample[3]))
                     elif i == 1:
-                        measurements.append(float(line[3]) + 0.2)
+                        measurements.append(float(batch_sample[3]) + 0.2)
                     else:
-                        measurements.append(float(line[3]) - 0.2)
+                        measurements.append(float(batch_sample[3]) - 0.2)
 
+                    # flip images to simulate track other way around
                     images.append(cv2.flip(image, 1))
 
                     if i == 0:
-                        measurements.append(float(line[3]) * -1.0)
+                        measurements.append(float(batch_sample[3]) * -1.0)
                     elif i == 1:
-                        measurements.append((float(line[3]) + 0.2) * -1.0)
+                        measurements.append((float(batch_sample[3]) + 0.2) * -1.0)
                     else:
-                        measurements.append((float(line[3]) - 0.2) * -1.0)
+                        measurements.append((float(batch_sample[3]) - 0.2) * -1.0)
 
+                    # random brightness adjustments to simulate different lighting conditions
+                    image_brightness = cv2.cvtColor(image, cv2.COLOR_YUV2RGB);
+                    image_brightness = cv2.cvtColor(image, cv2.COLOR_RGB2HSV);
+                    image_brightness = np.array(image_brightness, dtype=np.float64)
+                    rand_brightness = 0.5 * np.random.uniform()
+                    image_brightness[:,:,2] = image_brightness[:,:,2] * rand_brightness
+                    image_brightness[:,:,2][image_brightness[:,:,2] > 255] = 255
+                    image_brightness = np.array(image_brightness, dtype=np.uint8)
+                    image_brightness = cv2.cvtColor(image_brightness, cv2.COLOR_HSV2RGB)
+                    image_brightness = cv2.cvtColor(image_brightness, cv2.COLOR_RGB2YUV)
+
+                    images.append(image_brightness)
+
+                    if i == 0:
+                        measurements.append(float(batch_sample[3]))
+                    elif i == 1:
+                        measurements.append(float(batch_sample[3]) + 0.2)
+                    else:
+                        measurements.append(float(batch_sample[3]) - 0.2)
+
+                    # shift images for lane switches
+                    x_translation = 80 * np.random.uniform() - 80/2
+
+                    if i == 0:
+                        steering = float(batch_sample[3])
+                    elif i == 1:
+                        steering = float(batch_sample[3]) + 0.2
+                    else:
+                        steering = float(batch_sample[3]) - 0.2
+
+                    steering_ang = steering + x_translation / 20*2*0.2
+
+                    y_translation = 40 * np.random.uniform()- 40/2
+                    translation_matrix = np.float32([[1, 0, x_translation], [0, 1, y_translation]])
+                    trans_img = cv2.warpAffine(image, translation_matrix, (320, 160))
+
+                    images.append(trans_img)
+                    measurements.append(steering_ang)
 
             # convert to numpy arrays as this format is needed by Keras
             X_train = np.array(images)
@@ -84,7 +123,7 @@ def generator(samples, batch_size=32):
 
 ### neural network and training ###
 # size for batch processing
-batch_size = 32
+batch_size = 25
 
 # generators for training and validation
 train_generator = generator(train_samples, batch_size=batch_size)
@@ -120,10 +159,10 @@ model.add(Flatten())
 
 # Fully connected layers
 model.add(Dense(100, activation='elu'))
-#model.add(Dropout(0.2))
+model.add(Dropout(0.2))
 
 model.add(Dense(50, activation='elu'))
-#model.add(Dropout(0.5))
+model.add(Dropout(0.5))
 
 model.add(Dense(10, activation='elu'))
 
@@ -136,11 +175,12 @@ for layer in model.layers:
 
 
 # compile model, use mean square error loss function as it's a continuous output with regression
-model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+adam = optimizers.Adam(lr=0.0001)
+model.compile(loss='mse', optimizer=adam, metrics=['accuracy'])
 #model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=4)
 model.fit_generator(train_generator, steps_per_epoch=math.ceil(len(train_samples) / batch_size), \
     validation_data=validation_generator, validation_steps=math.ceil(len(validation_samples) / batch_size),
-    epochs=5, verbose=1)
+    epochs=30, verbose=1)
 
 # save the model for usage
 model.save('model.h5')
