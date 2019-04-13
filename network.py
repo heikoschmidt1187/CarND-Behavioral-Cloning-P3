@@ -8,6 +8,7 @@ import math
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Conv2D, MaxPooling2D, Cropping2D, Input, GlobalAveragePooling2D, Dropout
 from keras import optimizers
+from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
 
 import sklearn
 from sklearn.model_selection import train_test_split
@@ -25,6 +26,11 @@ with open('./training_data/driving_log.csv') as csvfile:
 
 # split samples into training and validation data
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
+
+def get_callbacks():
+    earlystopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=1, verbose=1, mode='auto')
+
+    return [earlystopping]
 
 # generator to handle batches
 def generator(samples, batch_size=32):
@@ -159,11 +165,9 @@ model.add(Flatten())
 
 # Fully connected layers
 model.add(Dense(100, activation='elu'))
-model.add(Dropout(0.2))
-
-model.add(Dense(50, activation='elu'))
 model.add(Dropout(0.5))
 
+model.add(Dense(50, activation='elu'))
 model.add(Dense(10, activation='elu'))
 
 # Output layer
@@ -180,7 +184,7 @@ model.compile(loss='mse', optimizer=adam, metrics=['accuracy'])
 #model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=4)
 model.fit_generator(train_generator, steps_per_epoch=math.ceil(len(train_samples) / batch_size), \
     validation_data=validation_generator, validation_steps=math.ceil(len(validation_samples) / batch_size),
-    epochs=30, verbose=1)
+    epochs=200, verbose=1, callbacks=get_callbacks())
 
 # save the model for usage
 model.save('model.h5')
