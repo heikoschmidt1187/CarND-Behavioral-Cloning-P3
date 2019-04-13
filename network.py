@@ -180,23 +180,23 @@ model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 
 # First convolutional layer, 2x2 stride, 5x5 kernel
 model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
-model.add(BatchNormalization());
+#model.add(BatchNormalization());
 
 # Second convolutional layer, 2x2 stride, 5x5 kernel
 model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
-model.add(BatchNormalization());
+#model.add(BatchNormalization());
 
 # Third convolutional layer, 2x2 stride, 5x5 kernel
 model.add(Conv2D(48, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
-model.add(BatchNormalization());
+#model.add(BatchNormalization());
 
 # Fourth convolutional layer, no stride, 3x3 kernel
 model.add(Conv2D(64, kernel_size=(3, 3), activation='elu'))
-model.add(BatchNormalization());
+#model.add(BatchNormalization());
 
 # Fifth convolutional layer, no stride, 3x3 kernel
 model.add(Conv2D(64, kernel_size=(3, 3), activation='elu'))
-model.add(BatchNormalization());
+#model.add(BatchNormalization());
 
 # Flatten Layer
 model.add(Flatten())
@@ -216,7 +216,8 @@ model.summary()
 
 
 # compile model, use mean square error loss function as it's a continuous output with regression
-adam = optimizers.Adam(lr=0.0001)
+#adam = optimizers.Adam(lr=0.0001)
+adam = optimizers.Adam(lr=0.001)
 model.compile(loss='mse', optimizer=adam, metrics=['accuracy'])
 #model.fit(X_train, y_train, validation_split=0.2, shuffle=True, epochs=4)
 model.fit_generator(train_generator, steps_per_epoch=math.ceil(len(train_samples) / batch_size), \

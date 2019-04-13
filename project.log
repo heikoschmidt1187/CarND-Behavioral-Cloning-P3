@@ -241,3 +241,24 @@ Epoch 7/10
 Epoch 8/10
 372/372 [==============================] - 212s 570ms/step - loss: 0.0192 - acc: 0.0539 - val_loss: 0.0166 - val_acc: 0.0517
 Epoch 00008: early stopping
+
+3x Schattendurchfahrt große Auflösung, batch norm raus, LR auf 0.001 angepasst
+
+397/397 [==============================] - 196s 493ms/step - loss: 0.0335 - acc: 0.0543 - val_loss: 0.0213 - val_acc: 0.0477
+Epoch 2/10
+397/397 [==============================] - 199s 502ms/step - loss: 0.0212 - acc: 0.0545 - val_loss: 0.0179 - val_acc: 0.0477
+Epoch 3/10
+397/397 [==============================] - 198s 500ms/step - loss: 0.0188 - acc: 0.0545 - val_loss: 0.0166 - val_acc: 0.0477
+Epoch 4/10
+397/397 [==============================] - 202s 509ms/step - loss: 0.0176 - acc: 0.0545 - val_loss: 0.0148 - val_acc: 0.0477
+Epoch 5/10
+397/397 [==============================] - 204s 514ms/step - loss: 0.0166 - acc: 0.0545 - val_loss: 0.0140 - val_acc: 0.0477
+Epoch 6/10
+397/397 [==============================] - 195s 491ms/step - loss: 0.0162 - acc: 0.0545 - val_loss: 0.0138 - val_acc: 0.0477
+Epoch 7/10
+397/397 [==============================] - 197s 495ms/step - loss: 0.0155 - acc: 0.0545 - val_loss: 0.0137 - val_acc: 0.0477
+Epoch 8/10
+397/397 [==============================] - 200s 504ms/step - loss: 0.0150 - acc: 0.0545 - val_loss: 0.0131 - val_acc: 0.0477
+Epoch 9/10
+397/397 [==============================] - 200s 503ms/step - loss: 0.0145 - acc: 0.0545 - val_loss: 0.0134 - val_acc: 0.0477
+Epoch 00009: early stopping
