@@ -75,7 +75,7 @@ class NvidiaModel():
 
         return model
 
-    def train_model(self, batch_size, test_size=0.2, learning_rate=0.001, epochs=10, model_save_path='model.h5'):
+    def train_model(self, parameter_set, model_save_path='model.h5'):
         """
         `batch_size` Input Batch size for fit_generator training.
         `test_size` Input percentage of samples to use as validation set
@@ -87,22 +87,22 @@ class NvidiaModel():
         a good batch_size according to your GPU hardware to gain maximum performance.
         """
         # split samples into training and validation data
-        train_samples, validation_samples = train_test_split(self.preprocessor.samples, test_size=0.2)
+        train_samples, validation_samples = train_test_split(self.preprocessor.samples, test_size=parameter_set['validation_set'])
 
         # generators for training and validation
-        train_generator = self.preprocessor.generator(train_samples, batch_size=batch_size)
-        validation_generator = self.preprocessor.generator(validation_samples, batch_size=batch_size)
+        train_generator = self.preprocessor.generator(train_samples, batch_size=parameter_set['batch_size'])
+        validation_generator = self.preprocessor.generator(validation_samples, batch_size=parameter_set['batch_size'])
 
         # compile model, use mean square error loss function as it's a continuous output with regression
-        adam = optimizers.Adam(lr=learning_rate)
+        adam = optimizers.Adam(lr=parameter_set['learning_rate'])
 
         # compile model with adam optimizer
         self.model.compile(loss='mse', optimizer=adam)
 
         # fit model with generators
-        self.model.fit_generator(train_generator, steps_per_epoch=math.ceil(len(train_samples) / batch_size), \
-            validation_data=validation_generator, validation_steps=math.ceil(len(validation_samples) / batch_size),
-            epochs=epochs, verbose=1, callbacks=self.get_callbacks())
+        self.model.fit_generator(train_generator, steps_per_epoch=math.ceil(len(train_samples) / parameter_set['batch_size']), \
+            validation_data=validation_generator, validation_steps=math.ceil(len(validation_samples) / parameter_set['batch_size']),
+            epochs=parameter_set['epochs'], verbose=1, callbacks=self.get_callbacks())
 
         # save the model for usage
         self.model.save(model_save_path)

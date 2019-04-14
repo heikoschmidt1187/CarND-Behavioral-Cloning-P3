@@ -262,3 +262,42 @@ Epoch 8/10
 Epoch 9/10
 397/397 [==============================] - 200s 503ms/step - loss: 0.0145 - acc: 0.0545 - val_loss: 0.0134 - val_acc: 0.0477
 Epoch 00009: early stopping
+
+OO approach
+Epoch 1/10
+2019-04-14 11:18:51.876930: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+2019-04-14 11:18:51.911002: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2594085000 Hz
+2019-04-14 11:18:51.911744: I tensorflow/compiler/xla/service/service.cc:150] XLA service 0x55f1d10023a0 executing computations on platform Host. Devices:
+2019-04-14 11:18:51.911795: I tensorflow/compiler/xla/service/service.cc:158]   StreamExecutor device (0): <undefined>, <undefined>
+2019-04-14 11:18:51.979386: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:998] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2019-04-14 11:18:51.980435: I tensorflow/compiler/xla/service/service.cc:150] XLA service 0x55f1d0ef2de0 executing computations on platform CUDA. Devices:
+2019-04-14 11:18:51.980466: I tensorflow/compiler/xla/service/service.cc:158]   StreamExecutor device (0): GeForce GTX 950M, Compute Capability 5.0
+2019-04-14 11:18:51.980867: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1433] Found device 0 with properties:
+name: GeForce GTX 950M major: 5 minor: 0 memoryClockRate(GHz): 1.124
+pciBusID: 0000:01:00.0
+totalMemory: 1.96GiB freeMemory: 1.92GiB
+2019-04-14 11:18:51.981056: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1512] Adding visible gpu devices: 0
+2019-04-14 11:18:52.727954: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-04-14 11:18:52.728004: I tensorflow/core/common_runtime/gpu/gpu_device.cc:990]      0
+2019-04-14 11:18:52.728023: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1003] 0:   N
+2019-04-14 11:18:52.728363: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1115] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 1666 MB memory) -> physical GPU (device: 0, name: GeForce GTX 950M, pci bus id: 0000:01:00.0, compute capability: 5.0)
+2019-04-14 11:18:53.511140: I tensorflow/stream_executor/dso_loader.cc:152] successfully opened CUDA library libcublas.so.10.1 locally
+397/397 [==============================] - 188s 473ms/step - loss: 0.0348 - val_loss: 0.0257
+Epoch 2/10
+397/397 [==============================] - 181s 457ms/step - loss: 0.0265 - val_loss: 0.0238
+Epoch 3/10
+397/397 [==============================] - 179s 450ms/step - loss: 0.0242 - val_loss: 0.0209
+Epoch 4/10
+397/397 [==============================] - 178s 449ms/step - loss: 0.0223 - val_loss: 0.0198
+Epoch 5/10
+397/397 [==============================] - 178s 448ms/step - loss: 0.0205 - val_loss: 0.0174
+Epoch 6/10
+397/397 [==============================] - 177s 447ms/step - loss: 0.0197 - val_loss: 0.0169
+Epoch 7/10
+397/397 [==============================] - 177s 447ms/step - loss: 0.0179 - val_loss: 0.0150
+Epoch 8/10
+397/397 [==============================] - 176s 444ms/step - loss: 0.0170 - val_loss: 0.0142
+Epoch 9/10
+397/397 [==============================] - 178s 449ms/step - loss: 0.0156 - val_loss: 0.0124
+Epoch 10/10
+397/397 [==============================] - 178s 448ms/step - loss: 0.0145 - val_loss: 0.0121

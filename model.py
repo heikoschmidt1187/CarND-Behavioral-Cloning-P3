@@ -9,17 +9,16 @@ if __name__ == '__main__':
     model = NvidiaModel(preprocessor)
 
     ### neural network and training ###
-    # size for batch processing
-    batch_size = 16
-
-    # learning rate
-    learning_rate = 0.001
-
-    # validation set size in percent
-    validation_set = 0.2
-
-    # epochs for training
-    epochs = 10
+    parameter_set = {
+        # size for batch processing
+        'batch_size' : 16,
+        # learning rate
+        'learning_rate' : 0.001,
+        # validation set size in percent
+        'validation_set' : 0.2,
+        # epochs for training
+        'epochs' : 10
+    }
 
     # train the model
-    model.train_model(batch_size, validation_set, learning_rate, epochs, 'model.h5')
+    model.train_model(parameter_set, 'model.h5')
