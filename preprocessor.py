@@ -184,8 +184,7 @@ class Preprocessor():
         shift_img = cv2.warpAffine(img, trans_matrix, (self.image_cols, self.image_rows))
 
         # adapt measurement according to the shifted horizontal pixels
-        # HINT: 0.004 steering angle per pixel shift works fine
-        shift_measure = measure + x_trans / self.max_x_shift * 2 * 0.2
+        shift_measure = measure + x_trans / self.max_x_shift * 2 * 0.004
 
         return shift_img, shift_measure
 
