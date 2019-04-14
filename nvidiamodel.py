@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 
 from keras import optimizers
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda, Cropping2D, Input, Dropout, Conv2D
+from keras.layers import Flatten, Dense, Lambda, Cropping2D, Input, Dropout, Conv2D, Activation, BatchNormalization
 from keras.callbacks import EarlyStopping
 
 
@@ -38,37 +38,49 @@ class NvidiaModel():
         model.add(Cropping2D(cropping=((70, 25), (0, 0))))
 
         # First convolutional layer, 2x2 stride, 5x5 kernel
-        model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
-        #model.add(BatchNormalization());
+        model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2)))
+        model.add(BatchNormalization());
+        model.add(Activation('elu'))
 
         # Second convolutional layer, 2x2 stride, 5x5 kernel
-        model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
-        #model.add(BatchNormalization());
+        model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2)))
+        model.add(BatchNormalization());
+        model.add(Activation('elu'))
 
         # Third convolutional layer, 2x2 stride, 5x5 kernel
-        model.add(Conv2D(48, kernel_size=(5, 5), strides=(2, 2), activation='elu'))
-        #model.add(BatchNormalization());
+        model.add(Conv2D(48, kernel_size=(5, 5), strides=(2, 2)))
+        model.add(BatchNormalization());
+        model.add(Activation('elu'))
 
         # Fourth convolutional layer, no stride, 3x3 kernel
-        model.add(Conv2D(64, kernel_size=(3, 3), activation='elu'))
-        #model.add(BatchNormalization());
+        model.add(Conv2D(64, kernel_size=(3, 3)))
+        model.add(BatchNormalization());
+        model.add(Activation('elu'))
 
         # Fifth convolutional layer, no stride, 3x3 kernel
-        model.add(Conv2D(64, kernel_size=(3, 3), activation='elu'))
-        #model.add(BatchNormalization());
+        model.add(Conv2D(64, kernel_size=(3, 3)))
+        model.add(BatchNormalization());
+        model.add(Activation('elu'))
 
         # Flatten Layer
         model.add(Flatten())
 
         # Fully connected layers
-        model.add(Dense(100, activation='elu'))
-        model.add(Dropout(0.5))
+        model.add(Dense(100))
+        model.add(BatchNormalization());
+        model.add(Activation('elu'))
+        #model.add(Dropout(0.5))
 
-        model.add(Dense(50, activation='elu'))
-        model.add(Dense(10, activation='elu'))
+        model.add(Dense(50))
+        model.add(BatchNormalization());
+        model.add(Activation('elu'))
+
+        model.add(Dense(10))
+        model.add(BatchNormalization());
+        model.add(Activation('elu'))
 
         # Output layer
-        model.add(Dense(1, activation='elu'))
+        model.add(Dense(1))
 
         # print model summary
         model.summary()
