@@ -1,6 +1,6 @@
-import csv
+
+"""
 import matplotlib.pyplot as plt
-import numpy as np
 
 # create samples to hold the paths
 samples = []
@@ -65,3 +65,4 @@ for sample in samples:
 
 plt.hist(angles, bins=40, align='mid')
 plt.show()
+"""
